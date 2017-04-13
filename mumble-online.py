@@ -12,6 +12,10 @@ from subprocess import check_output
 import mice
 
 
+def color(color_id, string):
+	return '\x1b[{}m{}\x1b[0m'.format(color_id, string)
+
+
 def group_by(iterable, key):
 	data = sorted(iterable, key=key)
 	return dict(
@@ -39,7 +43,10 @@ def format_user(user):
 		status = ' [deaf]'
 	elif user.selfMute:
 		status = ' [mute]'
-	return '{}{}'.format(user.name.decode('utf8'), status)
+	return '{}{}'.format(
+		color(92, user.name.decode('utf8')),
+		color(91, status),
+	)
 
 
 raw_fortune = check_output('/usr/games/fortune -s -n 50 -o'.split(' '))
