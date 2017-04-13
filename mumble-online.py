@@ -56,6 +56,7 @@ def get_fortune():
 		if not re.search('[:,.!?]$', line):
 			line += ','
 		lines.append(line)
+	lines[-1] = re.sub(',$', '', lines[-1])
 	return u' '.join(lines)
 
 
