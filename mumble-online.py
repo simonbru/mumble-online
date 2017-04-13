@@ -16,22 +16,12 @@ def color(color_id, string):
 	return u'\x1b[{}m{}\x1b[0m'.format(color_id, string)
 
 
-def group_by(iterable, key):
-	data = sorted(iterable, key=key)
-	return dict(
-		(key, list(group))
-		for key, group in itertools.groupby(data, key)
-	)
-
-
-def format_chan(channel, channels_by_parent, users_by_chan):
-	yield channel.name
-	for user in users_by_chan.get(channel.id, []):
+def format_chan(subtree):
+	yield subtree.c.name
+	for user in subtree.users:
 		yield u'├─ ' + format_user(user)
-	for child_chan in channels_by_parent.get(channel.id, []):
-		child_lines = list(format_chan(
-			child_chan, channels_by_parent, users_by_chan
-		))
+	for child in subtree.children:
+		child_lines = list(format_chan(child))
 		yield u'├─ ' + child_lines[0].decode('utf8')
 		for line in child_lines[1:]:
 			yield u'│  ' + line
@@ -55,18 +45,11 @@ fortune = ', '.join(
 )
 
 while True:
-	server = mice.m.getServer(1)
-	channels = server.getChannels()
-	users = server.getUsers().values()
+	server = mice.s
+	tree = server.getTree()
 	os.system('clear')
-	print(u'Rababou - {:%H:%M:%S} ~ {}'.format(datetime.now(), fortune))
-	print()
-	channels_by_parent = group_by(
-		channels.values(), key=lambda c: c.parent
-	)
-	users_by_chan = group_by(users, key=lambda u: u.channel)
-	print(
-		*format_chan(channels[0], channels_by_parent, users_by_chan),
-		sep='\n'
-	)
+	print(u'Rababou - {:%H:%M:%S} ~ {}\n'.format(
+		datetime.now(), fortune
+	))
+	print(*format_chan(tree), sep='\n')
 	time.sleep(5)
