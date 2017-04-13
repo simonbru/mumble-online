@@ -13,7 +13,7 @@ import mice
 
 
 def color(color_id, string):
-	return '\x1b[{}m{}\x1b[0m'.format(color_id, string)
+	return u'\x1b[{}m{}\x1b[0m'.format(color_id, string)
 
 
 def group_by(iterable, key):
@@ -38,12 +38,12 @@ def format_chan(channel, channels_by_parent, users_by_chan):
 
 
 def format_user(user):
-	status = ''
+	status = u''
 	if user.selfDeaf:
-		status = ' [deaf]'
+		status = u' [deaf]'
 	elif user.selfMute:
-		status = ' [mute]'
-	return '{}{}'.format(
+		status = u' [mute]'
+	return u'{}{}'.format(
 		color(92, user.name.decode('utf8')),
 		color(91, status),
 	)
@@ -59,7 +59,7 @@ while True:
 	channels = server.getChannels()
 	users = server.getUsers().values()
 	os.system('clear')
-	print('Rababou - {:%H:%M:%S} ~ {}'.format(datetime.now(), fortune))
+	print(u'Rababou - {:%H:%M:%S} ~ {}'.format(datetime.now(), fortune))
 	print()
 	channels_by_parent = group_by(
 		channels.values(), key=lambda c: c.parent
