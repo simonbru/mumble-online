@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import itertools
 import os
+import re
 import sys
 import time
 from datetime import datetime
@@ -39,16 +40,28 @@ def format_user(user):
 	)
 
 
-raw_fortune = check_output('/usr/games/fortune -s -n 50 -o'.split(' '))
-fortune = ', '.join(
-	line.strip() for line in raw_fortune.split('\n') if line.strip()
-)
+def get_fortune():
+	raw_fortune = check_output(
+		'/usr/games/fortune -s -n 50 -o'.split(' ')
+	)
+	lines = []
+	for line in raw_fortune.split('\n'):
+		line = line.strip()
+		if not line:
+			continue
+		if not re.search('[:,.!?]$', line):
+			line += ','
+		lines.append(line)
+	return u' '.join(lines)
 
+
+fortune = get_fortune()
 while True:
 	server = mice.s
 	tree = server.getTree()
+	tree.c.name = u'Rababou'
 	os.system('clear')
-	print(u'Rababou - {:%H:%M:%S} ~ {}\n'.format(
+	print(u'{:%H:%M:%S} ~ {}\n'.format(
 		datetime.now(), fortune
 	))
 	print(*format_chan(tree), sep='\n')
