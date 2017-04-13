@@ -17,6 +17,10 @@ def color(color_id, string):
 	return u'\x1b[{}m{}\x1b[0m'.format(color_id, string)
 
 
+def clear():
+	print('\x1b[2J\x1b[H', end='')
+
+
 def format_chan(subtree):
 	yield subtree.c.name
 	for user in subtree.users:
@@ -55,14 +59,25 @@ def get_fortune():
 	return u' '.join(lines)
 
 
-fortune = get_fortune()
-while True:
-	server = mice.s
-	tree = server.getTree()
+def render_screen(tree):
 	tree.c.name = u'Rababou'
-	os.system('clear')
-	print(u'{:%H:%M:%S} ~ {}\n'.format(
-		datetime.now(), fortune
-	))
-	print(*format_chan(tree), sep='\n')
-	time.sleep(5)
+	yield u'{:%H:%M:%S} ~ {}\n'.format(datetime.now(), fortune)
+	for line in format_chan(tree):
+		yield line
+
+
+fortune = get_fortune()
+server = mice.s
+old_lines = []
+skip_count = 0
+while True:
+	tree = server.getTree()
+	lines = list(render_screen(tree))
+	if skip_count < 30 and old_lines[1:] == lines[1:]:
+		skip_count += 1
+	else:
+		print('\x1b[2J\x1b[H', end='')
+		print(*lines, sep='\n')
+		skip_count = 0
+		old_lines = lines
+	time.sleep(1)
