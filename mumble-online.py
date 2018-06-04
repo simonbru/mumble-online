@@ -74,7 +74,7 @@ skip_count = 0
 while True:
 	tree = server.getTree()
 	lines = list(render_screen(tree))
-	if skip_count < 30 and old_lines[1:] == lines[1:]:
+	if skip_count < 600 and old_lines[1:] == lines[1:]:
 		skip_count += 1
 	else:
 		print('\x1b[2J\x1b[H', end='')
