@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 
 import itertools
 import os
@@ -11,6 +11,8 @@ from datetime import datetime
 from subprocess import check_output
 
 import mice
+
+from config import SERVER_NAME, SPECIAL_USERS
 
 
 def color(color_id, string):
@@ -38,8 +40,11 @@ def format_user(user):
 		status = u' [deaf]'
 	elif user.selfMute:
 		status = u' [mute]'
+	user_color = 92
+	if user.name in SPECIAL_USERS or user.userid in SPECIAL_USERS:
+		user_color = 94
 	return u'{}{}'.format(
-		color(92, user.name.decode('utf8')),
+		color(user_color, user.name.decode('utf8')),
 		color(91, status),
 	)
 
