@@ -66,7 +66,7 @@ def get_fortune():
 
 
 def render_screen(tree):
-	tree.c.name = u'Rababou'
+	tree.c.name = SERVER_NAME
 	yield u'{:%H:%M:%S} ~ {}\n'.format(datetime.now(), fortune)
 	for line in format_chan(tree):
 		yield line
