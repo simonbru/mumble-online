@@ -6,6 +6,7 @@ import re
 import sys
 import time
 from datetime import datetime
+from enum import IntEnum
 from subprocess import check_output
 
 import mice3 as mice
@@ -13,8 +14,15 @@ import mice3 as mice
 from config import HIDE_EMPTY_CHANS, SERVER_NAME, SPECIAL_USERS
 
 
-def color(color_id, string):
-	return u'\x1b[{}m{}\x1b[0m'.format(color_id, string)
+class Color(IntEnum):
+	"""Terminal color"""
+	LIGHT_RED = 91
+	LIGHT_GREEN = 92
+	LIGHT_BLUE = 94
+
+
+def colorize(color, string):
+	return '\x1b[{}m{}\x1b[0m'.format(color, string)
 
 
 def clear():
@@ -46,12 +54,12 @@ def format_user(user):
 		status = ' [deaf]'
 	elif user.selfMute:
 		status = ' [mute]'
-	user_color = 92
+	user_color = Color.LIGHT_GREEN
 	if user.name in SPECIAL_USERS or user.userid in SPECIAL_USERS:
-		user_color = 94
+		user_color = Color.LIGHT_BLUE
 	return '{}{}'.format(
-		color(user_color, user.name),
-		color(91, status),
+		colorize(user_color, user.name),
+		colorize(Color.LIGHT_RED, status),
 	)
 
 
