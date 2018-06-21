@@ -1,6 +1,4 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8
-from __future__ import absolute_import, print_function
+#!/usr/bin/env python3
 
 import itertools
 import os
@@ -10,7 +8,7 @@ import time
 from datetime import datetime
 from subprocess import check_output
 
-import mice
+import mice3 as mice
 
 from config import HIDE_EMPTY_CHANS, SERVER_NAME, SPECIAL_USERS
 
@@ -32,27 +30,27 @@ def has_users(subtree):
 def format_chan(subtree):
 	yield subtree.c.name
 	for user in subtree.users:
-		yield u'├─ ' + format_user(user)
+		yield '├─ ' + format_user(user)
 	for child in subtree.children:
 		if HIDE_EMPTY_CHANS and not has_users(child):
 			continue
 		child_lines = list(format_chan(child))
-		yield u'├─ ' + child_lines[0].decode('utf8')
+		yield '├─ ' + child_lines[0]
 		for line in child_lines[1:]:
-			yield u'│  ' + line
+			yield '│  ' + line
 
 
 def format_user(user):
-	status = u''
+	status = ''
 	if user.selfDeaf:
-		status = u' [deaf]'
+		status = ' [deaf]'
 	elif user.selfMute:
-		status = u' [mute]'
+		status = ' [mute]'
 	user_color = 92
 	if user.name in SPECIAL_USERS or user.userid in SPECIAL_USERS:
 		user_color = 94
-	return u'{}{}'.format(
-		color(user_color, user.name.decode('utf8')),
+	return '{}{}'.format(
+		color(user_color, user.name),
 		color(91, status),
 	)
 
@@ -60,7 +58,7 @@ def format_user(user):
 def get_fortune():
 	raw_fortune = check_output(
 		'/usr/games/fortune -s -n 50 -o'.split(' ')
-	)
+	).decode('utf8')
 	lines = []
 	for line in raw_fortune.split('\n'):
 		line = line.strip()
@@ -70,11 +68,11 @@ def get_fortune():
 			line += ','
 		lines.append(line)
 	lines[-1] = re.sub(',$', '', lines[-1])
-	return u' '.join(lines)
+	return ' '.join(lines)
 
 
 def render_screen(tree):
-	yield u'{:%H:%M:%S} ~ {}\n'.format(datetime.now(), fortune)
+	yield '{:%H:%M:%S} ~ {}\n'.format(datetime.now(), fortune)
 	if HIDE_EMPTY_CHANS and not has_users(tree):
 		yield "~ No one is there ~"
 	else:
