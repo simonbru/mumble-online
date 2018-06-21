@@ -12,7 +12,7 @@ from subprocess import check_output
 
 import mice
 
-from config import SERVER_NAME, SPECIAL_USERS
+from config import HIDE_EMPTY_CHANS, SERVER_NAME, SPECIAL_USERS
 
 
 def color(color_id, string):
@@ -23,11 +23,19 @@ def clear():
 	print('\x1b[2J\x1b[H', end='')
 
 
+def has_users(subtree):
+	return subtree.users or any(
+		has_users(tree) for tree in subtree.children
+	)
+
+
 def format_chan(subtree):
 	yield subtree.c.name
 	for user in subtree.users:
 		yield u'├─ ' + format_user(user)
 	for child in subtree.children:
+		if HIDE_EMPTY_CHANS and not has_users(child):
+			continue
 		child_lines = list(format_chan(child))
 		yield u'├─ ' + child_lines[0].decode('utf8')
 		for line in child_lines[1:]:
@@ -66,10 +74,13 @@ def get_fortune():
 
 
 def render_screen(tree):
-	tree.c.name = SERVER_NAME
 	yield u'{:%H:%M:%S} ~ {}\n'.format(datetime.now(), fortune)
-	for line in format_chan(tree):
-		yield line
+	if HIDE_EMPTY_CHANS and not has_users(tree):
+		yield "~ No one is there ~"
+	else:
+		tree.c.name = SERVER_NAME
+		for line in format_chan(tree):
+			yield line
 
 
 fortune = get_fortune()

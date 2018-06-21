@@ -1,3 +1,5 @@
+HIDE_EMPTY_CHANS = True
+
 SERVER_NAME = u"Root"
 
 # Show special users (e.g. bots, admins) in a different color.
