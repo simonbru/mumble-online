@@ -65,17 +65,11 @@ def format_user(user):
 
 def get_fortune():
 	raw_fortune = check_output(
-		'/usr/games/fortune -s -n 50 -o'.split(' ')
+		'/usr/games/fortune -s -n 50'.split(' ')
 	).decode('utf8')
-	lines = []
-	for line in raw_fortune.split('\n'):
-		line = line.strip()
-		if not line:
-			continue
-		if not re.search('[:,.!?]$', line):
-			line += ','
-		lines.append(line)
-	lines[-1] = re.sub(',$', '', lines[-1])
+	lines = filter(None, (
+		line.strip() for line in raw_fortune.split('\n')
+	))
 	return ' '.join(lines)
 
 
